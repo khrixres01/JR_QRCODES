@@ -1,0 +1,69 @@
+# Wedding Companion
+
+A phone-sized web app guests open by scanning a QR code. It carries the order of
+service, the reception programme, the menu, a shared photo wall and a guestbook.
+
+Built from `wedding-app-prototype-v2.html`, which is kept as the visual reference.
+
+## Setup
+
+1. Install dependencies.
+
+   ```
+   npm install
+   ```
+
+2. Create a Supabase project, then run `supabase/schema.sql` in its SQL editor.
+   That creates the two tables, their row-level security policies, and the
+   public `wedding-photos` storage bucket.
+
+3. Copy the environment template and fill it in.
+
+   ```
+   cp .env.local.example .env.local
+   ```
+
+   | Variable | Purpose |
+   | --- | --- |
+   | `NEXT_PUBLIC_SUPABASE_URL` | Project URL from Supabase settings |
+   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Anon public key, safe in the browser |
+   | `COUPLE_PASSCODE` | Six digits, server-side only. Pick a fresh one |
+   | `NEXT_PUBLIC_SITE_URL` | Deployed URL, used by the QR generator |
+   | `SUPABASE_SERVICE_ROLE_KEY` | Needed only for hide/unhide moderation |
+
+4. Run it.
+
+   ```
+   npm run dev
+   ```
+
+## Routes
+
+| Path | What it is |
+| --- | --- |
+| `/` | The guest app, six tabs |
+| `/couple` | Passcode-gated dashboard for moderation and bulk download |
+| `/qr` | A printable QR code pointing at `NEXT_PUBLIC_SITE_URL` |
+
+## Printable QR files
+
+```
+npm run qr
+```
+
+Writes a 2000px PNG and an SVG to `public/qr/`. That folder is git-ignored.
+
+## How the passcode works
+
+The passcode never reaches the browser. A guest submits it to `/api/verify`,
+which compares it in constant time and, on success, sets an HttpOnly cookie
+holding an HMAC keyed by the passcode itself. Download and moderation routes
+verify that cookie. Changing `COUPLE_PASSCODE` invalidates every cookie already
+issued. The cookie lasts 12 hours.
+
+## Notes
+
+- Photo uploads accept JPEG, PNG, WebP and HEIC up to 12 MB.
+- The wall and guestbook refresh every 20 seconds.
+- Hidden rows stay in the database. Guests cannot read them because row-level
+  security filters on `hidden = false`.
