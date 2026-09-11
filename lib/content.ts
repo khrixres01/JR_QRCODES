@@ -21,6 +21,7 @@ export const reception: string[] = [
   "Opening Prayer",
   "Best Man / Chief Bridesmaid Speech",
   "Cutting of the Cake",
+  "Toast to the Couple",
   "Father & Daughter Dance",
   "Mother & Son Dance",
   "Couple’s First Dance",
