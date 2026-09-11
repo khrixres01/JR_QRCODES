@@ -30,7 +30,6 @@ export default function Photos({
   }, []);
 
   useEffect(() => {
-    setName(window.localStorage.getItem("guestName") ?? "");
     load();
     const t = setInterval(load, 20000);
     return () => clearInterval(t);
@@ -66,7 +65,6 @@ export default function Photos({
     }
 
     const trimmed = name.trim().slice(0, 40);
-    if (trimmed) window.localStorage.setItem("guestName", trimmed);
 
     const ins = await supabase
       .from("photos")
@@ -77,6 +75,7 @@ export default function Photos({
       setNote("Saved the image but could not add it to the wall.");
       return;
     }
+    setName("");
     setNote("Thank you — your photo is on the wall.");
     load();
   }
