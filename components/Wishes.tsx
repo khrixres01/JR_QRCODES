@@ -21,7 +21,6 @@ export default function Wishes() {
   }, []);
 
   useEffect(() => {
-    setName(window.localStorage.getItem("guestName") ?? "");
     load();
     const t = setInterval(load, 20000);
     return () => clearInterval(t);
@@ -46,8 +45,8 @@ export default function Wishes() {
       setNote("Could not save your message. Please try again.");
       return;
     }
-    if (trimmed) window.localStorage.setItem("guestName", trimmed);
     setMessage("");
+    setName("");
     setNote("Thank you for signing the guestbook.");
     load();
   }
