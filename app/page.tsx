@@ -29,7 +29,7 @@ export default function App() {
 
   function go(next: View) {
     setView(next);
-    document.getElementById("screen")?.scrollTo({ top: 0 });
+    window.scrollTo({ top: 0 });
   }
 
   function onUnlocked(g: Gate) {
@@ -42,7 +42,7 @@ export default function App() {
   }
 
   return (
-    <div className={`phone${view === "home" ? " on-home" : ""}`}>
+    <div className={`app${view === "home" ? " on-home" : ""}`}>
       <Backdrop />
 
       <div className="screen" id="screen">
@@ -67,16 +67,18 @@ export default function App() {
       </div>
 
       <nav className="nav">
-        {TABS.map((t) => (
-          <button
-            key={t.key}
-            className={view === t.key ? "active" : undefined}
-            onClick={() => go(t.key)}
-          >
-            <span className="ic">{t.icon}</span>
-            {t.label}
-          </button>
-        ))}
+        <div className="nav-inner">
+          {TABS.map((t) => (
+            <button
+              key={t.key}
+              className={view === t.key ? "active" : undefined}
+              onClick={() => go(t.key)}
+            >
+              <span className="ic">{t.icon}</span>
+              {t.label}
+            </button>
+          ))}
+        </div>
       </nav>
 
       <PasscodeModal
