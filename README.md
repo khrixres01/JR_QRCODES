@@ -53,6 +53,23 @@ npm run qr
 
 Writes a 2000px PNG and an SVG to `public/qr/`. That folder is git-ignored.
 
+## Clearing test data
+
+```
+npm run reset            # shows what is there, deletes nothing
+npm run reset -- --yes   # deletes it
+```
+
+Removes every photo row, every guestbook message, and every file in the
+storage bucket. Ceremony content is untouched, since that lives in the code.
+Needs `SUPABASE_SERVICE_ROLE_KEY` in `.env.local`, because row-level security
+blocks deletes otherwise. Deletion is permanent.
+
+The same thing by hand: in the Supabase dashboard, empty the `photos` and
+`wishes` tables from the Table Editor, then delete the files in the
+`wedding-photos` bucket under Storage. The bucket is separate from the tables,
+so clearing rows alone leaves the images behind.
+
 ## How the passcode works
 
 The passcode never reaches the browser. A guest submits it to `/api/verify`,
