@@ -1,0 +1,78 @@
+name: Keep Supabase awake
+
+# Supabase pauses free projects after 7 days without activity. A paused project
+# breaks the photo wall and the guestbook until someone resumes it by hand, so
+# this pings the database every 3 days to reset that timer.
+#
+# Needs two repository secrets (Settings -> Secrets and variables -> Actions):
+#   SUPABASE_URL       same value as NEXT_PUBLIC_SUPABASE_URL
+#   SUPABASE_ANON_KEY  same value as NEXT_PUBLIC_SUPABASE_ANON_KEY
+#
+# The anon key is used deliberately. A plain read is enough to count as
+# activity, so the service role key never has to live in GitHub.
+
+on:
+  schedule:
+    - cron: "17 6 */3 * *" # every 3 days at 06:17 UTC
+  workflow_dispatch: # and a Run workflow button, for checking it by hand
+
+permissions:
+  contents: write
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ping the database
+        env:
+          URL: ${{ secrets.SUPABASE_URL }}
+          KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          set -u
+          if [ -z "${URL}" ] || [ -z "${KEY}" ]; then
+            echo "::error::Missing SUPABASE_URL or SUPABASE_ANON_KEY repository secret."
+            exit 1
+          fi
+
+          code=$(curl -sS -o /tmp/body -w '%{http_code}' \
+            -H "apikey: ${KEY}" \
+            -H "Authorization: Bearer ${KEY}" \
+            "${URL}/rest/v1/wishes?select=id&limit=1")
+
+          echo "HTTP ${code}"
+          head -c 300 /tmp/body || true
+          echo
+
+          case "${code}" in
+            2*) echo "Database answered. The 7-day pause timer is reset." ;;
+            *)  echo "::error::Ping failed with HTTP ${code}. The project may already be paused — resume it in the Supabase dashboard."
+                exit 1 ;;
+          esac
+
+      # GitHub disables scheduled workflows after 60 days of repository
+      # inactivity. This project will sit untouched for months, so a commit
+      # every 25 days keeps the schedule itself alive.
+      - name: Keep scheduled workflows enabled
+        if: github.event_name == 'schedule'
+        run: |
+          set -eu
+          stamp_file=.github/last-heartbeat
+          last=$(cat "$stamp_file" 2>/dev/null || echo 0)
+          now=$(date +%s)
+          age=$(( now - last ))
+
+          if [ "$age" -lt 2160000 ]; then
+            echo "Heartbeat is $(( age / 86400 )) days old. Nothing to do."
+            exit 0
+          fi
+
+          date -u +%s > "$stamp_file"
+          date -u +"%Y-%m-%d %H:%M UTC" > "$stamp_file.txt"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$stamp_file" "$stamp_file.txt"
+          git commit -m "chore: heartbeat, keep scheduled workflows enabled"
+          git push

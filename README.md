@@ -70,6 +70,33 @@ The same thing by hand: in the Supabase dashboard, empty the `photos` and
 `wedding-photos` bucket under Storage. The bucket is separate from the tables,
 so clearing rows alone leaves the images behind.
 
+## Keeping the site alive between now and December
+
+Supabase pauses free projects after 7 days without activity, which breaks the
+photo wall and guestbook until someone resumes the project by hand. Vercel is
+not a concern: deployments with a domain attached are exempt from its 30-day
+retention cull.
+
+`.github/workflows/keep-supabase-awake.yml` pings the database every 3 days so
+that timer never runs out. It needs two repository secrets, under Settings ->
+Secrets and variables -> Actions:
+
+| Secret | Value |
+| --- | --- |
+| `SUPABASE_URL` | same as `NEXT_PUBLIC_SUPABASE_URL` |
+| `SUPABASE_ANON_KEY` | same as `NEXT_PUBLIC_SUPABASE_ANON_KEY` |
+
+The anon key is deliberate. A plain read counts as activity, so the service
+role key never has to live in GitHub.
+
+GitHub also disables scheduled workflows after 60 days of repository
+inactivity. Since nobody will be committing here after the wedding, the job
+commits a heartbeat file every 25 days to keep its own schedule enabled.
+
+If the ping ever fails, the run goes red and GitHub emails you. That usually
+means the project was already paused and needs resuming in the Supabase
+dashboard.
+
 ## How the passcode works
 
 The passcode never reaches the browser. A guest submits it to `/api/verify`,
