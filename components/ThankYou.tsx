@@ -15,7 +15,6 @@ export default function ThankYou() {
         {/* The card's words are inside the image, so repeat them for screen readers. */}
         <p className="sr-only">{thankYou.message}</p>
       </div>
-      <div className="pad" />
     </>
   );
 }

@@ -29,7 +29,7 @@ const TABS: { key: View; icon: string; label: string }[] = [
   { key: "menu", icon: "🍽️", label: "Menu" },
   { key: "photos", icon: "📷", label: "Photos" },
   { key: "wishes", icon: "✍", label: "Wishes" },
-  { key: "thanks", icon: "💌", label: "Thanks" },
+  { key: "thanks", icon: "💌", label: "Appreciation" },
 ];
 
 export default function App() {
