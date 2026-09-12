@@ -60,3 +60,12 @@ export const menuSides: MenuItem[] = [
 
 export const menuFoot =
   "Several dishes contain crayfish. Kindly inform an usher of any allergies.";
+
+export const thankYou = {
+  alt: "Thank you card from Jemima and Ruona",
+  message:
+    "Thank You. From the bottom of our hearts, thank you for being part of our special day. " +
+    "Your love, presence and kindness made our celebration truly unforgettable. " +
+    "We are so grateful to have you in our lives. You truly mean the world to us. " +
+    "With love and gratitude, Jemima and Ruona.",
+};

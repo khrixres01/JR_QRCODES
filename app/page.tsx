@@ -7,10 +7,18 @@ import Reception from "@/components/Reception";
 import Menu from "@/components/Menu";
 import Photos from "@/components/Photos";
 import Wishes from "@/components/Wishes";
+import ThankYou from "@/components/ThankYou";
 import PasscodeModal from "@/components/PasscodeModal";
 import Backdrop from "@/components/Backdrop";
 
-export type View = "home" | "order" | "reception" | "menu" | "photos" | "wishes";
+export type View =
+  | "home"
+  | "order"
+  | "reception"
+  | "menu"
+  | "photos"
+  | "wishes"
+  | "thanks";
 
 export type Gate = { mode: "all" | "one"; photoId?: string };
 
@@ -21,6 +29,7 @@ const TABS: { key: View; icon: string; label: string }[] = [
   { key: "menu", icon: "🍽️", label: "Menu" },
   { key: "photos", icon: "📷", label: "Photos" },
   { key: "wishes", icon: "✍", label: "Wishes" },
+  { key: "thanks", icon: "💌", label: "Thanks" },
 ];
 
 export default function App() {
@@ -63,6 +72,9 @@ export default function App() {
         </section>
         <section className={`view${view === "wishes" ? " active" : ""}`}>
           <Wishes />
+        </section>
+        <section className={`view${view === "thanks" ? " active" : ""}`}>
+          <ThankYou />
         </section>
       </div>
 
